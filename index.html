@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contas a Dois</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="theme-color" content="#14213d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Contas a Dois">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2f6;--card:#fff;--ink:#14213d;--mut:#5d6b82;--line:#d9e0ea;--a:#2f5bea;--b:#e08a00;--ok:#1b8a5a;--bad:#c93a3a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1624;--card:#18223a;--ink:#eaf0fb;--mut:#9aa8c2;--line:#2a3652;--a:#6f93ff;--b:#ffb23e;--ok:#4cc88f;--bad:#ff7a7a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1624;--card:#18223a;--ink:#eaf0fb;--mut:#9aa8c2;--line:#2a3652;--a:#6f93ff;--b:#ffb23e;--ok:#4cc88f;--bad:#ff7a7a;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.4 "Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:600px;margin:0 auto;padding:14px}
+h1{font-size:22px;font-weight:800;margin:2px 0 10px}
+h2{font-size:16px;font-weight:600;margin:0 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px}
+.row{display:flex;gap:8px;align-items:center}
+.sp{justify-content:space-between}
+input,select,button{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px;min-height:42px;min-width:0}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--a);outline-offset:1px}
+button{cursor:pointer;font-weight:600}
+button.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto}
+.tabs button{flex:1;white-space:nowrap}
+.tabs button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.mes b{flex:1;text-align:center;text-transform:capitalize}
+.mes button{width:42px}
+.mut{color:var(--mut);font-size:14px}.pos{color:var(--ok)}.neg{color:var(--bad)}
+.big{font-size:34px;font-weight:800;letter-spacing:-1px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g3{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:6px;align-items:center}
+.f{display:flex;flex-direction:column;gap:2px;font-size:13px;color:var(--mut)}
+.f input{width:100%}
+.p{border-left:5px solid var(--a)}.p.b{border-left-color:var(--b)}
+.kv{display:flex;justify-content:space-between;padding:4px 0;border-top:1px solid var(--line)}
+.kv:first-of-type{border-top:0}
+details{border-top:1px solid var(--line);padding:6px 0}
+details:first-of-type{border-top:0}
+summary{cursor:pointer;font-weight:600;display:flex;justify-content:space-between;gap:8px}
+.h{font-size:12px;color:var(--mut)}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:3px}
+.bar i{display:block;height:100%;background:var(--a)}
+ul{list-style:none;margin:0;padding:0}
+li{display:flex;gap:8px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+li:first-child{border-top:0}
+li .t{flex:1;min-width:0}li .t div:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+li button{min-height:34px;padding:2px 10px;background:none;color:var(--mut)}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:8px}.form .full{grid-column:1/-1}
+.seg{display:flex;gap:6px}.seg button{flex:1}.seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+</style>
+</head>
+<body>
+<main>
+<h1>Contas a Dois</h1>
+<div class="card row mes"><button id="prev" aria-label="Mês anterior">‹</button><b id="mes"></b><button id="next" aria-label="Próximo mês">›</button></div>
+<nav class="tabs" id="tabs"></nav>
+<div id="v"></div>
+</main>
+<script>
+const G={
+"Renda":["Salário","Renda de Juros","Dividendos","Dinheiro Inesperado","Reembolsos","Transferência de Poupança","Renda extra","Outros"],
+"Moradia":["Aluguel/Parcelas do Imóvel","Seguros","Conta de Luz","Gasolina","Conta de Água","Telefone","Tv a Cabo","Internet","Eletrodomésticos","Jardinagem","Manutenção","Melhorias","Outros"],
+"Vida diária":["Supermercado","Suprimentos Pessoais","Roupas","Produtos de Limpeza","Educação","Jantar/Comer Fora","Salão de Beleza","PetShop"],
+"Transporte":["Parcelamento do Carro","Seguro do Carro","Combustível","Ônibus/Táxi","Reparos"],
+"Saúde":["Seguro de Vida","Consulta","Dentista","Medicamentos","Rotina saudável","Veterinário"],
+"Caridade/Presentes":["Presentes","Doações para Caridade","Doações Religiosas"],
+"Assinaturas":["Jornal","Revistas","Associações"],
+"Entretenimento":["Filmes/Cinema","Música","Games","Shows","Livros","Hobbies","Fotografia","Esportes","Passeios","Brinquedos","Férias","Viagem","Teatro"],
+"Economias":["Fundo de Emergência","Transferência de Poupança","Investimentos","Educação"],
+"Obrigações":["Dívidas","Empréstimo estudantil","Outro empréstimo","Cartões de crédito","Taxas e Impostos","Outros"],
+"Diversos":["Taxas Bancárias","Outros"]};
+const DESP=Object.keys(G).filter(g=>g!=="Renda"&&g!=="Economias");
+const FX=["Moradia","Mercado","Água/Luz","Internet","Streaming","Parc. Móveis","Outros","Investimentos"];
+const IV=["Cartão","Roupas","Transporte","Cosméticos","Lazer"];
+const KEY="contas-a-dois-v2";
+let S={n:["Pessoa 1","Pessoa 2"],inc:[{sal:0,ben:0},{sal:0,ben:0}],fx:{},iv:[{},{}],ideal:{inv:20,fix:40,var:20,meta:10},meta:0,bud:{},tx:[]};
+try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.tx)S=o}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+const brl=v=>(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const N=x=>+x||0;
+const now=new Date();let ano=now.getFullYear(),mes=now.getMonth(),tab="hoje",tipo="S";
+const pre=()=>`${ano}-${String(mes+1).padStart(2,"0")}`;
+const mtx=()=>S.tx.filter(x=>x.data.startsWith(pre()));
+const sumG=(g,l)=>(l||mtx()).filter(x=>x.cat.startsWith(g+"|")).reduce((s,x)=>s+x.valor,0);
+const who=i=>i===2?"Casal":S.n[i];
+const TABS=[["hoje","Hoje"],["lanc","Lançamentos"],["orc","Orçamento"],["hist","Histórico"]];
+function setp(p,v){const k=p.split(".");let o=S;for(let i=0;i<k.length-1;i++)o=o[k[i]]=o[k[i]]||{};o[k[k.length-1]]=v;save()}
+function getp(p){let o=S;for(const k of p.split("."))o=o&&o[k];return o}
+const inp=(p,l)=>`<label class="f">${l}<input type="number" inputmode="decimal" step="0.01" data-p="${p}" value="${getp(p)||""}" placeholder="0"></label>`;
+function bind(f){document.querySelectorAll("[data-p]").forEach(e=>e.oninput=()=>{setp(e.dataset.p,e.type==="number"?N(e.value):e.value);f&&f()})}
+
+function head(){
+  $("mes").textContent=new Date(ano,mes,1).toLocaleDateString("pt-BR",{month:"long",year:"numeric"});
+  $("tabs").innerHTML=TABS.map(([k,l])=>`<button class="${tab===k?"on":""}" data-t="${k}">${l}</button>`).join("");
+  $("tabs").querySelectorAll("button").forEach(b=>b.onclick=()=>{tab=b.dataset.t;render()});
+}
+$("prev").onclick=()=>{mes--;if(mes<0){mes=11;ano--}render()};
+$("next").onclick=()=>{mes++;if(mes>11){mes=0;ano++}render()};
+
+/* ---------- HOJE ---------- */
+function vHoje(){
+  $("v").innerHTML=`
+  <div class="card"><h2>Renda baseada no salário</h2>
+   ${[0,1].map(i=>`<div class="card p ${i?"b":""}" style="margin-bottom:8px"><label class="f">Provedor<input data-p="n.${i}" value="${esc(S.n[i])}"></label>
+   <div class="g2" style="margin-top:6px">${inp(`inc.${i}.sal`,"Renda mensal")}${inp(`inc.${i}.ben`,"Benefícios")}</div><div class="mut" id="sh${i}"></div></div>`).join("")}
+   <div class="kv"><span>Renda total (A + B)</span><b id="tot"></b></div>
+   <div class="kv"><span>Essencial</span><b id="ess"></b></div>
+   <div class="kv"><span>Variável</span><b id="vr"></b></div></div>
+  <div class="card"><h2>Custos mensais do casal</h2><div class="g2">${FX.map(k=>inp("fx."+k,k)).join("")}</div>
+   <div class="kv" style="margin-top:8px"><span>Residual do casal</span><b id="res"></b></div></div>
+  ${[0,1].map(i=>`<div class="card p ${i?"b":""}"><h2 id="ih${i}"></h2><div class="mut" id="pr${i}"></div>
+   <div class="g2" style="margin-top:6px">${IV.map(k=>inp(`iv.${i}.${k}`,k)).join("")}</div>
+   <div class="kv" style="margin-top:8px"><span>Residual individual</span><b id="lf${i}"></b></div></div>`).join("")}
+  <div class="card"><h2>Metas (% da renda total)</h2><div class="g2">${inp("meta","Meta mensal (R$)")}${inp("ideal.inv","Ideal investimentos %")}${inp("ideal.fix","Ideal custos fixos %")}${inp("ideal.var","Ideal custos variáveis %")}${inp("ideal.meta","Ideal metas %")}</div>
+   <div id="mt" style="margin-top:8px"></div></div>`;
+  bind(calc);calc();
+  [0,1].forEach(i=>document.querySelector(`[data-p="n.${i}"]`).oninput=e=>{S.n[i]=e.target.value||"Pessoa "+(i+1);save();calc()});
+}
+function calc(){
+  const tot=N(S.inc[0].sal)+N(S.inc[1].sal),fx=S.fx||{};
+  const fxT=FX.reduce((s,k)=>s+N(fx[k]),0),ess=["Moradia","Mercado","Água/Luz","Internet","Streaming","Parc. Móveis"].reduce((s,k)=>s+N(fx[k]),0);
+  const res=tot-fxT,iv=i=>IV.reduce((s,k)=>s+N(S.iv[i][k]),0);
+  const sh=i=>tot?N(S.inc[i].sal)/tot:0;
+  $("tot").textContent=brl(tot);$("ess").textContent=brl(ess);$("vr").textContent=brl(tot-ess);
+  $("res").textContent=brl(res);$("res").className=res>=0?"pos":"neg";
+  [0,1].forEach(i=>{
+    $("sh"+i).textContent=`${(sh(i)*100).toFixed(1)}% da renda do casal`;
+    $("ih"+i).textContent="Custos individuais · "+S.n[i];
+    const pr=res*sh(i);$("pr"+i).textContent=`Parte proporcional do residual: ${brl(pr)}`;
+    const l=pr-iv(i);$("lf"+i).textContent=brl(l);$("lf"+i).className=l>=0?"pos":"neg";
+  });
+  const items=[["Investimentos",N(fx.Investimentos),S.ideal.inv],["Custos fixos",fxT-N(fx.Investimentos),S.ideal.fix],["Custos variáveis",iv(0)+iv(1),S.ideal.var],["Metas",N(S.meta),S.ideal.meta]];
+  $("mt").innerHTML=items.map(([l,v,id])=>{const p=tot?v/tot*100:0;return `<div class="kv"><span>${l}</span><span>${p.toFixed(1)}% <span class="h">/ ideal ${N(id)}%</span></span></div><div class="bar"><i style="width:${Math.min(100,p)}%"></i></div>`}).join("");
+}
+
+/* ---------- LANÇAMENTOS ---------- */
+function vLanc(){
+  const opts=(tipo==="E"?["Renda"]:Object.keys(G).filter(g=>g!=="Renda")).map(g=>`<optgroup label="${g}">${G[g].map(c=>`<option value="${g}|${c}">${c}</option>`).join("")}</optgroup>`).join("");
+  const m=mtx().sort((a,b)=>b.data.localeCompare(a.data)||b.id-a.id);
+  $("v").innerHTML=`<div class="card"><h2>Novo lançamento</h2><div class="form">
+   <div class="seg full"><button id="tS" class="${tipo==="S"?"on":""}">Despesa</button><button id="tE" class="${tipo==="E"?"on":""}">Receita</button></div>
+   <input id="desc" class="full" placeholder="Descrição">
+   <input id="val" type="number" inputmode="decimal" step="0.01" min="0" placeholder="Valor (R$)"><input id="data" type="date">
+   <select id="cat" class="full" aria-label="Categoria">${opts}</select>
+   <select id="quem" class="full" aria-label="Quem">${[0,1,2].map(i=>`<option value="${i}">${esc(who(i))}</option>`).join("")}</select>
+   <button class="pri full" id="add">Adicionar</button></div></div>
+  <div class="card"><h2>Lançamentos do mês</h2><ul>${m.length?m.map(x=>`<li><div class="t"><div>${esc(x.desc)}</div><div class="mut">${x.data.split("-").reverse().slice(0,2).join("/")} · ${esc(x.cat.split("|")[1])} · ${esc(who(x.quem))}</div></div><b class="${x.tipo==="E"?"pos":""}">${x.tipo==="E"?"+":"−"}${brl(x.valor)}</b><button data-id="${x.id}" aria-label="Excluir">✕</button></li>`).join(""):`<li class="mut">Nenhum lançamento neste mês.</li>`}</ul></div>`;
+  $("data").valueAsDate=new Date(ano,mes,Math.min(now.getDate(),28));
+  $("tS").onclick=()=>{tipo="S";vLanc()};$("tE").onclick=()=>{tipo="E";vLanc()};
+  $("add").onclick=()=>{const v=parseFloat($("val").value);if(!(v>0)){$("val").focus();return}
+    S.tx.push({id:Date.now(),tipo,desc:$("desc").value.trim()||$("cat").value.split("|")[1],valor:v,data:$("data").value,cat:$("cat").value,quem:+$("quem").value});save();vLanc()};
+  $("v").querySelectorAll("li button").forEach(b=>b.onclick=()=>{S.tx=S.tx.filter(x=>x.id!==+b.dataset.id);save();vLanc()});
+}
+
+/* ---------- ORÇAMENTO ---------- */
+function vOrc(){
+  const l=mtx(),k=pre();
+  const rowG=g=>{
+    const isR=g==="Renda";let tb=0,ta=0;
+    const rows=G[g].map(c=>{const key=`${g}|${c}`,b=N(S.bud[k+"|"+key]),a=l.filter(x=>x.cat===key).reduce((s,x)=>s+x.valor,0);tb+=b;ta+=a;
+      const d=isR?a-b:b-a;return `<div class="g3"><span>${c}</span><input type="number" inputmode="decimal" step="0.01" data-b="${k}|${key}" value="${b||""}" placeholder="0" aria-label="Orçamento ${c}"><span style="text-align:right" class="${d<0?"neg":""}">${brl(a)}</span></div>`}).join("");
+    const d=isR?ta-tb:tb-ta;
+    return `<details><summary><span>${g}</span><span class="${d<0?"neg":"mut"}">${brl(ta)} / ${brl(tb)}</span></summary><div class="g3 h"><span>Categoria</span><span>Orçamento</span><span style="text-align:right">Atual</span></div>${rows}</details>`};
+  const rb=g=>G[g].reduce((s,c)=>s+N(S.bud[k+"|"+g+"|"+c]),0);
+  const ren=sumG("Renda",l),des=DESP.reduce((s,g)=>s+sumG(g,l),0),eco=sumG("Economias",l);
+  const bR=rb("Renda"),bD=DESP.reduce((s,g)=>s+rb(g),0);
+  $("v").innerHTML=`<div class="card"><h2>Resumo do orçamento</h2>
+   <div class="kv"><span>Renda total</span><span>${brl(ren)} <span class="h">/ orç. ${brl(bR)}</span></span></div>
+   <div class="kv"><span>Despesas totais</span><span>${brl(des)} <span class="h">/ orç. ${brl(bD)}</span></span></div>
+   <div class="kv"><span>Resultado</span><b class="${ren-des>=0?"pos":"neg"}">${brl(ren-des)}</b></div>
+   <div class="kv"><span>Economias (fora das despesas)</span><span>${brl(eco)}</span></div></div>
+  <div class="card"><h2>Por grupo</h2><div class="mut" style="margin-bottom:6px">Toque num grupo e defina o orçamento de cada categoria. Valor vermelho = estourou o orçamento.</div>${Object.keys(G).map(rowG).join("")}</div>`;
+  document.querySelectorAll("[data-b]").forEach(e=>e.onchange=()=>{S.bud[e.dataset.b]=N(e.value);save();const o=[...document.querySelectorAll("details")].map(d=>d.open);vOrc();document.querySelectorAll("details").forEach((d,i)=>d.open=o[i])});
+}
+
+/* ---------- HISTÓRICO ---------- */
+function vHist(){
+  const ms=[];for(let m=0;m<12;m++){const p=`${ano}-${String(m+1).padStart(2,"0")}`,l=S.tx.filter(x=>x.data.startsWith(p));
+    const r=sumG("Renda",l),d=DESP.reduce((s,g)=>s+sumG(g,l),0);ms.push({m,r,d,e:sumG("Economias",l)})}
+  const mx=Math.max(1,...ms.map(x=>Math.max(x.r,x.d)));
+  const T=ms.reduce((a,x)=>({r:a.r+x.r,d:a.d+x.d,e:a.e+x.e}),{r:0,d:0,e:0});
+  $("v").innerHTML=`<div class="card"><h2>${ano}</h2><div class="kv"><span>Renda total</span><b class="pos">${brl(T.r)}</b></div><div class="kv"><span>Despesas</span><b>${brl(T.d)}</b></div><div class="kv"><span>Economias</span><b>${brl(T.e)}</b></div><div class="kv"><span>Resultado</span><b class="${T.r-T.d>=0?"pos":"neg"}">${brl(T.r-T.d)}</b></div></div>
+  <div class="card"><h2>Mês a mês</h2>${ms.map(x=>`<div style="margin-bottom:8px"><div class="kv" style="border:0;padding:0"><span style="text-transform:capitalize">${new Date(ano,x.m,1).toLocaleDateString("pt-BR",{month:"short"})}</span><span class="h">renda ${brl(x.r)} · despesas ${brl(x.d)}</span></div><div class="bar"><i style="width:${x.r/mx*100}%;background:var(--ok)"></i></div><div class="bar"><i style="width:${x.d/mx*100}%;background:var(--bad)"></i></div></div>`).join("")}</div>`;
+}
+
+function render(){head();({hoje:vHoje,lanc:vLanc,orc:vOrc,hist:vHist})[tab]()}
+render();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+</script>
+</body>
+</html>

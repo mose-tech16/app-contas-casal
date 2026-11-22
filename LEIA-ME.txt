@@ -1,0 +1,13 @@
+CONTAS A DOIS - instalar como app (PWA)
+
+1) Publique esta pasta num endereço HTTPS (obrigatório para instalar):
+   - Netlify: acesse app.netlify.com/drop e arraste a pasta/ZIP descompactado.
+   - ou GitHub Pages: suba os arquivos num repositório e ative Pages.
+2) Abra o endereço no celular:
+   - Android (Chrome): menu ⋮ > "Instalar app" (ou "Adicionar à tela inicial").
+   - iPhone (Safari): botão Compartilhar > "Adicionar à Tela de Início".
+3) Pronto: abre em tela cheia e funciona sem internet depois do primeiro acesso.
+
+Importante: os dados ficam salvos só no aparelho. Cada celular tem os seus.
+No iPhone, o Safari pode apagar dados de sites sem uso por ~7 dias; instalado
+na Tela de Início isso não acontece.
